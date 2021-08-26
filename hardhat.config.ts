@@ -1,10 +1,15 @@
 import 'dotenv/config';
 
 import "@nomiclabs/hardhat-ethers";
+import "@tenderly/hardhat-tenderly"
+import "@nomiclabs/hardhat-solhint"
 import "@nomiclabs/hardhat-waffle";
+import "hardhat-abi-exporter"
 import "hardhat-deploy"
 import "hardhat-deploy-ethers"
 import "hardhat-gas-reporter";
+import "hardhat-typechain"
+import "hardhat-watcher"
 import "solidity-coverage";
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -20,6 +25,9 @@ import "solidity-coverage";
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+import { HardhatUserConfig } from "hardhat/types"
+import { removeConsoleLog } from "hardhat-preprocessor"
+
 const accounts = {
   mnemonic: process.env.MNEMONIC || "test test test test test test test test test test test junk",
   // accountsBalance: "990000000000000000000",
@@ -27,7 +35,7 @@ const accounts = {
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-export default {
+const config: HardhatUserConfig = {
   solidity: "0.6.12",
   abiExporter: {
     path: "./abi",
@@ -39,6 +47,9 @@ export default {
   defaultNetwork: "hardhat",
   mocha: {
     timeout: 20000,
+  },
+  preprocess: {
+    eachLine: removeConsoleLog((bre) => bre.network.name !== "hardhat" && bre.network.name !== "localhost"),
   },
   namedAccounts: {
     deployer: {
@@ -85,6 +96,10 @@ export default {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
+  typechain: {
+    outDir: "types",
+    target: "ethers-v5",
+  },
   paths: {
     artifacts: "artifacts",
     cache: "cache",
@@ -95,3 +110,5 @@ export default {
     tests: "test",
   },
 };
+
+export default config
